@@ -2,6 +2,7 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const logger = require('morgan')
 const sports_route = require('./routes/sports.route')
+const events_route = require('./routes/events.route')
 
 require('dotenv').config()
 const PORT = process.env.SERVER_PORT
@@ -15,6 +16,7 @@ app.use(bodyParser.json())
 app.use(logger('dev'))
 
 app.use('/sports', sports_route)
+app.use('/events', events_route)
 
 // START THE SERVER
 const server = app.listen(PORT, () => {
