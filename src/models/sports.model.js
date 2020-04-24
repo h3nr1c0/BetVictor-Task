@@ -36,12 +36,12 @@ exports.getSportsByLanguage = async (language, sort) => {
     })
 }
 
-exports.getEventsBySportID = async (sportID) => {
+exports.getEventsBySportID = async (sportId, sort) => {
   return exports.getSportsByLanguage(undefined, false)
     .then(sports => {
       let found
-      if (sportID) {
-        const compareSportID = Number(sportID)
+      if (sportId) {
+        const compareSportID = Number(sportId)
         found = sports.filter(sport => sport.id === compareSportID)
       } else {
         found = sports
@@ -58,6 +58,18 @@ exports.getEventsBySportID = async (sportID) => {
           })
         }
       })
-      return events.sort((a, b) => a.pos - b.pos)
+      if (sort) {
+        return events.sort((a, b) => a.pos - b.pos)
+      } else {
+        return events
+      }
     })
+}
+
+exports.getEventByID = async (eventId) => {
+  return exports.getEventsBySportID(undefined, false)
+  .then(events => {
+    const event = events.filter(e => e.id === eventId)
+    return event
+  })
 }

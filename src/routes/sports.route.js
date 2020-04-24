@@ -10,7 +10,6 @@ router
     console.log(`GET sporst by languages: ${languages}`)
     getSportsByLanguage(req.query.lang)
     .then(sports => {
-      console.log(`length: ${sports.length}`);
       res.status(200).json(sports)
     })
     .catch(err => {

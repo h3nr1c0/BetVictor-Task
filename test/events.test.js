@@ -37,5 +37,20 @@ describe('Test events end point', function () {
         done()
       })
   })
+
+  const eventId = 1217024200
+  it(`get all data of event with Id: ${eventId}`, function (done) {
+    appBaseRoute
+      .get(`?eventId=${eventId}`)
+      .end(function (_err, res) {
+        if (_err) throw _err
+        expect(res.statusCode).to.equal(200)
+        expect(res.body).to.be.an('array').that.is.not.empty
+        // filter by sport_id of events
+        const filteredResponse = res.body.filter(event => event.sport_id === sportId)
+        // length of both results should match
+        expect(res.body.length).to.be.equal(filteredResponse.length)
+        done()
+      })
+  })
 })
-  
