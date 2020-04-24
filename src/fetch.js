@@ -4,7 +4,7 @@ const { get_data_url } =  require('./constants')
 exports.fetch_BVdata = async (lang) => {
     const page_no = 1
     const url = get_data_url(page_no, lang)
-    console.log('fetching: ', url);
+    console.info('fetching: ', url);
     
     return fetch(url)
     .then(response => response.json()
