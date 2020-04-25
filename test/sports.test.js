@@ -12,10 +12,10 @@ const timeOut = 50000
 
 let sport
 
-describe('Test sports end point', function () {
+describe('Test sports route', function () {
   this.timeout(timeOut)
 
-  it('get English sports', function (done) {
+  it('should return English sports', function (done) {
     appBaseRoute
       .get('?lang=en-gb')
       .end(function (_err, res) {
@@ -26,7 +26,7 @@ describe('Test sports end point', function () {
       })
   })
   
-  it('get German sports', function (done) {
+  it('should return German sports', function (done) {
     appBaseRoute
       .get('?lang=de-de')
       .end(function (_err, res) {
@@ -36,7 +36,7 @@ describe('Test sports end point', function () {
         done()
       })
   })
-  it('get Chinese sports', function (done) {
+  it('should return Chinese sports', function (done) {
     appBaseRoute
       .get('?lang=cn-cn')
       .end(function (_err, res) {
@@ -46,7 +46,7 @@ describe('Test sports end point', function () {
         done()
       })
   })
-  it('get sports of all supported languages', function (done) {
+  it('should return sports of all supported languages', function (done) {
     appBaseRoute
       .get('')
       .end(function (_err, res) {

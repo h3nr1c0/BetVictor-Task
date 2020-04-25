@@ -1,15 +1,16 @@
-// Sports model with cache
+// Main model with cache
 
 const { fetch_BVdata } = require('../fetch')
 const { get_languages } = require('../utils')
 const Cache = require('../cache')
+const { logger } = require('../logger')
 
 require('dotenv').config()
 const TTL = Number(process.env.CACHE_TTL)
 
 const cache = new Cache(TTL) // Create a new cache service instance
 cache.get_cache().on("expired", function (key, value) {
-  console.info(`cache for fetched "${key}" data expired`);
+  logger.info(`cache for fetched "${key}" data expired`);
 })
 
 const getSportsByLanguage = async (language, sort) => {

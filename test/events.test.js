@@ -2,6 +2,7 @@
 /* eslint-disable no-undef */
 const supertest = require('supertest')
 var expect = require('chai').expect
+// const fetch = require('node-fetch')
 
 require('dotenv').config()
 
@@ -11,9 +12,8 @@ const sportsBaseRoute = supertest(`http://localhost:${process.env.SERVER_PORT}/s
 const timeOut = 50000
 
 let sports_EN = [] // used to avoid using known sport id
-let validEventId
 let validSportId, invalidSportId
-let valid_event
+let validEvent
 
 function getEventsOfSport(sportId, sports) {
   const found_sports = sports.filter(s => s.id === sportId)
@@ -56,27 +56,62 @@ const pickEvent = (sportId, sports) => {
   if (eventsOfSport[arrIndex]) return eventsOfSport[arrIndex]
 }
 
-describe('Test events end point', function () {
+
+describe('Test events route', function () {
   this.timeout(timeOut)
 
-  // OK
-  before(`get all english sports `, (done) => {
-    sportsBaseRoute
-      .get('?lang=en-gb')
+  before(`should return all english sports `, (done) => {
+    supertest(`https://partners.betvictor.mobi/en-gb/in-play/1/events`)
+      .get('')
       .end(function (_err, res) {
-        if (_err) throw _err
-        expect(res.statusCode).to.equal(200)
-        expect(res.body).to.be.an('array').that.is.not.empty
-        sports_EN = JSON.parse(JSON.stringify(res.body))
-        validSportId = pickSportId(true, sports_EN)
-        invalidSportId = pickSportId(false, sports_EN)
-        valid_event = pickEvent(validSportId, sports_EN)
-        validEventId = valid_event.id
-        done()
+        const sports_count = res.body.result.sports.length
+        sportsBaseRoute
+          .get('?lang=en-gb')
+          .end(function (_err, res) {
+            if (_err) throw _err
+            expect(res.statusCode).to.equal(200)
+            expect(res.body).to.be.an('array').that.is.not.empty
+            expect(res.body.length).to.equal(sports_count)
+
+            sports_EN = JSON.parse(JSON.stringify(res.body))
+
+            validSportId = pickSportId(true, sports_EN)
+            invalidSportId = pickSportId(false, sports_EN)
+            validEvent = pickEvent(validSportId, sports_EN)
+            done()
+          })
       })
   })
 
-  it(`should return all events`, (done) => {
+  it(`should return all events WITH event count check`, (done) => {
+    let events_count = 0
+    supertest(`https://partners.betvictor.mobi/en-gb/in-play/1/events`)
+      .get('')
+      .end(function (_err, res) {
+        events_count += res.body.result.total_number_of_events
+        supertest(`https://partners.betvictor.mobi/de-de/in-play/1/events`)
+          .get('')
+          .end(function (_err, res) {
+            events_count += res.body.result.total_number_of_events
+            supertest(`https://partners.betvictor.mobi/cn-cn/in-play/1/events`)
+              .get('')
+              .end(function (_err, res) {
+                events_count += res.body.result.total_number_of_events
+                eventsBaseRoute
+                  .get('')
+                  .end(function (_err, res) {
+                    if (_err) throw _err
+                    expect(res.statusCode).to.equal(200)
+                    expect(res.body).to.be.an('array').that.is.not.empty
+                    expect(res.body.length, 'sum of total_number_of_events for all languages is not the same as all events').to.equal(events_count)
+                    done()
+                  })
+              })
+          })
+      })
+  })
+
+  it(`should return all events without event count check`, (done) => {
     eventsBaseRoute
       .get('')
       .end(function (_err, res) {
@@ -87,7 +122,7 @@ describe('Test events end point', function () {
       })
   })
 
-  it(`should return data of a known random event`, (done) => {
+  it(`should return data of a known event`, (done) => {
     // get all events
     eventsBaseRoute
       .get('')
@@ -96,22 +131,23 @@ describe('Test events end point', function () {
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.be.an('array').that.is.not.empty
         eventsBaseRoute
-          .get(`/${validSportId}/events/${validEventId}`)
+          .get(`/${validSportId}/events/${validEvent.id}`)
           .end(function (_err, res) {
             if (_err) throw _err
             expect(res.statusCode).to.equal(200)
+            expect(res.body).to.not.be.empty
             // get last of found events
             const response_item = res.body.pop()
-            // compare important fields with prevoius valid event
-            expect(response_item.id).to.eql(valid_event.id)
-            expect(response_item.event_type).to.eql(valid_event.event_type)
-            expect(response_item.event_path_id).to.eql(valid_event.event_path_id)
-            expect(response_item.sport_id).to.eql(valid_event.sport_id)
-            expect(response_item.desc).to.eql(valid_event.desc)
-            expect(response_item.oppADesc).to.eql(valid_event.oppADesc)
-            expect(response_item.oppAId).to.eql(valid_event.oppAId)
-            expect(response_item.oppBDesc).to.eql(valid_event.oppBDesc)
-            expect(response_item.oppBId).to.eql(valid_event.oppBId)
+            // compare main fields with valid event, timestamps may vary
+            expect(response_item.id).to.eql(validEvent.id)
+            expect(response_item.event_type).to.eql(validEvent.event_type)
+            expect(response_item.event_path_id).to.eql(validEvent.event_path_id)
+            expect(response_item.sport_id).to.eql(validEvent.sport_id)
+            expect(response_item.desc).to.eql(validEvent.desc)
+            expect(response_item.oppADesc).to.eql(validEvent.oppADesc)
+            expect(response_item.oppAId).to.eql(validEvent.oppAId)
+            expect(response_item.oppBDesc).to.eql(validEvent.oppBDesc)
+            expect(response_item.oppBId).to.eql(validEvent.oppBId)
             done()
           })
       })
@@ -169,7 +205,7 @@ describe('Test events end point', function () {
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.be.an('array').that.is.not.empty
         const filtered_events = getEventsOfSport(validSportId, sports_EN)
-        const sorted = filtered_events.sort((a,b) => a.pos - b.pos)
+        const sorted = filtered_events.sort((a, b) => a.pos - b.pos)
         expect(res.body.length).to.equal(sorted.length)
         done()
       })

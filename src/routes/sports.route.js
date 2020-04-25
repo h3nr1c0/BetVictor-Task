@@ -1,11 +1,10 @@
 const express = require('express')
 const router = express.Router()
-const { getSportsByLanguage } = require('../models/sports.model')
+const { getSportsByLanguage } = require('../models/model')
 
 router
   // GET sports
   .get('/', async (req, res) => {
-    // console.log(`GET sporst by languages: ${languages}`)
     getSportsByLanguage(req.query.lang)
     .then(sports => {
       res.status(200).json(sports)
