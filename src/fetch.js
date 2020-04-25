@@ -1,3 +1,9 @@
+/* 
+* Test BetVictor
+* Fetch BV data
+*/
+'use strict'
+
 const fetch = require('node-fetch')
 const { get_data_url } = require('./constants')
 const { logger } = require('./logger')

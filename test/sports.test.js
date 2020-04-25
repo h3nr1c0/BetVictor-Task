@@ -1,3 +1,9 @@
+/* 
+* Test BetVictor
+* Test sports route
+*/
+'use strict'
+
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 const supertest = require('supertest')
@@ -25,7 +31,7 @@ describe('Test sports route', function () {
         done()
       })
   })
-  
+
   it('should return German sports', function (done) {
     appBaseRoute
       .get('?lang=de-de')
@@ -55,5 +61,5 @@ describe('Test sports route', function () {
         expect(res.body).to.be.an('array').that.is.not.empty
         done()
       })
-  })  
+  })
 })

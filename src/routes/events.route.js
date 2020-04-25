@@ -1,3 +1,9 @@
+/* 
+* Test BetVictor
+* Events route
+*/
+'use strict'
+
 const express = require('express')
 const router = express.Router()
 const { getEventsBySportID, getEventByID } = require('../models/model')

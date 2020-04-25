@@ -1,4 +1,9 @@
-const winston = require('winston');
+/* 
+ * Test BetVictor
+ * Logger
+*/
+
+const winston = require('winston')
 
 const alignColorsAndTime = winston.format.combine(
   winston.format.colorize({

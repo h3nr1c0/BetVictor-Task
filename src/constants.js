@@ -1,3 +1,8 @@
+/* 
+ * Test BetVictor
+ * Constants shared across
+*/
+
 require('dotenv').config()
 
 exports.all_languages = process.env.LANGUAGES.split(',');

@@ -1,3 +1,9 @@
+/* 
+ * Test BetVictor
+ * Utilities
+*/
+'use strict'
+
 const { all_languages } =  require('./constants')
 
 // array of language or all languages

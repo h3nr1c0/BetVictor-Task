@@ -1,3 +1,8 @@
+/* 
+ * Test BetVictor
+ * Test events route
+*/
+
 /* eslint-disable no-unused-expressions */
 /* eslint-disable no-undef */
 const supertest = require('supertest')

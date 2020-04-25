@@ -1,4 +1,9 @@
-// Main model with cache
+/* 
+ * Test BetVictor
+ * results model with cache
+ * model.js
+*/
+'use strict'
 
 const { fetch_BVdata } = require('../fetch')
 const { get_languages } = require('../utils')
