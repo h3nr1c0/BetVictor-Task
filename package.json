@@ -6,6 +6,7 @@
   "scripts": {
     "test-sports": "mocha 'test/sports.test.js'",
     "test-events": "mocha 'test/events.test.js'",
+    "test-all": "mocha 'test/*.test.js'",
     "start": "node src/index"
   },
   "keywords": [],
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "supertest": "4.0.2"
+    "supertest": "4.0.2",
+    "mocha": "7.1.1"
   }
 }

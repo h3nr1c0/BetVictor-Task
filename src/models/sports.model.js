@@ -12,7 +12,7 @@ cache.get_cache().on("expired", function (key, value) {
   console.info(`cache for fetched "${key}" data expired`);
 })
 
-exports.getSportsByLanguage = async (language, sort) => {
+const getSportsByLanguage = async (language, sort) => {
   const languages = get_languages(language)
   return Promise.all(
     languages.map(lang => {
@@ -36,18 +36,18 @@ exports.getSportsByLanguage = async (language, sort) => {
     })
 }
 
-exports.getEventsBySportID = async (sportId, sort) => {
-  return exports.getSportsByLanguage(undefined, false)
+const getEventsBySportID = async (sportId, sort) => {
+  return getSportsByLanguage(undefined, false)
     .then(sports => {
-      let found
+      let found_sports
       if (sportId) {
         const compareSportID = Number(sportId)
-        found = sports.filter(sport => sport.id === compareSportID)
+        found_sports = sports.filter(sport => sport.id === compareSportID)
       } else {
-        found = sports
+        found_sports = sports
       }
       const events = []
-      found.map(sport => {
+      found_sports.map(sport => {
         if (sport.comp) {
           sport.comp.map(competition => {
             if (competition.events) {
@@ -66,10 +66,17 @@ exports.getEventsBySportID = async (sportId, sort) => {
     })
 }
 
-exports.getEventByID = async (eventId) => {
-  return exports.getEventsBySportID(undefined, false)
-  .then(events => {
-    const event = events.filter(e => e.id === eventId)
-    return event
-  })
+const getEventByID = async (sportId, eventId) => {
+  return getEventsBySportID(sportId, false)
+    .then(events => {
+      const found_event = events.filter(e => e.id === eventId)
+      return found_event
+    })
+}
+
+
+module.exports = {
+  getSportsByLanguage: getSportsByLanguage, 
+  getEventsBySportID: getEventsBySportID, 
+  getEventByID: getEventByID
 }

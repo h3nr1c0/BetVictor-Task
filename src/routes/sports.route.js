@@ -7,7 +7,7 @@ router
   // GET sports
   .get('/', async (req, res) => {
     const languages = get_languages(req.query.lang, true);
-    console.log(`GET sporst by languages: ${languages}`)
+    // console.log(`GET sporst by languages: ${languages}`)
     getSportsByLanguage(req.query.lang)
     .then(sports => {
       res.status(200).json(sports)

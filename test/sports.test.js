@@ -10,6 +10,8 @@ const appBaseRoute = supertest(appBaseURL)
 
 const timeOut = 50000
 
+let sport
+
 describe('Test sports end point', function () {
   this.timeout(timeOut)
 
@@ -53,5 +55,5 @@ describe('Test sports end point', function () {
         expect(res.body).to.be.an('array').that.is.not.empty
         done()
       })
-  })
+  })  
 })
