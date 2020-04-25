@@ -16,8 +16,6 @@ const appBaseRoute = supertest(appBaseURL)
 
 const timeOut = 50000
 
-let sport
-
 describe('Test sports route', function () {
   this.timeout(timeOut)
 
