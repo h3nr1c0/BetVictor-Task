@@ -88,7 +88,7 @@ describe('Test events route', function () {
       })
   })
 
-  it(`should return all events WITH event count check`, (done) => {
+  it(`should sum of events match`, (done) => {
     let events_count = 0
     supertest(`https://partners.betvictor.mobi/en-gb/in-play/1/events`)
       .get('')
@@ -116,7 +116,7 @@ describe('Test events route', function () {
       })
   })
 
-  it(`should return all events without event count check`, (done) => {
+  it(`should return all events`, (done) => {
     eventsBaseRoute
       .get('')
       .end(function (_err, res) {
@@ -202,7 +202,7 @@ describe('Test events route', function () {
       })
   })
 
-  it(`Should return events of known sportId`, function (done) {
+  it(`should return events of known sportId`, function (done) {
     eventsBaseRoute
       .get(`?sportId=${validSportId}`)
       .end(function (_err, res) {
@@ -216,7 +216,7 @@ describe('Test events route', function () {
       })
   })
 
-  it(`Should not return events of unknown sportId`, function (done) {
+  it(`should not return events of unknown sportId`, function (done) {
     eventsBaseRoute
       .get(`?sportId=${invalidSportId}`)
       .end(function (_err, res) {
@@ -228,7 +228,7 @@ describe('Test events route', function () {
   })
 
   const invalidEventId = 555555
-  it(`Should not return data of unknown event with Id: ${invalidEventId}`, function (done) {
+  it(`should not return data of unknown event with Id: ${invalidEventId}`, function (done) {
     eventsBaseRoute
       .get(`/${validSportId}/events/${invalidEventId}`)
       .end(function (_err, res) {
