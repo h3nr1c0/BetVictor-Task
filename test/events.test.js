@@ -7,7 +7,6 @@
 /* eslint-disable no-undef */
 const supertest = require('supertest')
 var expect = require('chai').expect
-// const fetch = require('node-fetch')
 
 require('dotenv').config()
 
@@ -16,10 +15,13 @@ const sportsBaseRoute = supertest(`http://localhost:${process.env.SERVER_PORT}/s
 
 const timeOut = 50000
 
+// vars populated before running tests used instead of mocking
 let sports_EN = [] // used to avoid using known sport id
 let validSportId, invalidSportId
 let validEvent
+let sports_all
 
+// returns events of sport
 function getEventsOfSport(sportId, sports) {
   const found_sports = sports.filter(s => s.id === sportId)
   const eventsOfSport = []
@@ -35,15 +37,17 @@ function getEventsOfSport(sportId, sports) {
   return eventsOfSport
 }
 
-const pickSportId = (existing, array) => {
-  if (!Array.isArray(array)) return 0
-  if (existing) { // pick 1 from existing events
-    const arrIndex = Math.floor(Math.random() * array.length)
-    if (array[arrIndex]) return array[arrIndex].id
+// select sport id from array
+const pickSportId = (valid, sports) => {
+  if (!Array.isArray(sports)) return 0
+  if (valid) { // pick 1 from existing events
+    const arrIndex = Math.floor(Math.random() * sports.length)
+    if (sports[arrIndex]) return sports[arrIndex].id
   } else { // unknown/invalid id
     let id = 1
+    // find id not used zet start with 1 and inc.
     while (true) {
-      if (array.filter(e => { e.id === id }).length > 0) {
+      if (sports.filter(e => { e.id === id }).length > 0) {
         id += 1
       } else {
         return id
@@ -52,6 +56,8 @@ const pickSportId = (existing, array) => {
   }
 }
 
+
+// selects and returns random event from sports
 const pickEvent = (sportId, sports) => {
   const eventsOfSport = getEventsOfSport(sportId, sports)
   if (!eventsOfSport || eventsOfSport.length == 0) {
@@ -77,9 +83,8 @@ describe('Test events route', function () {
             expect(res.statusCode).to.equal(200)
             expect(res.body).to.be.an('array').that.is.not.empty
             expect(res.body.length).to.equal(sports_count)
-
+            // set glob. vars
             sports_EN = JSON.parse(JSON.stringify(res.body))
-
             validSportId = pickSportId(true, sports_EN)
             invalidSportId = pickSportId(false, sports_EN)
             validEvent = pickEvent(validSportId, sports_EN)
@@ -88,33 +93,6 @@ describe('Test events route', function () {
       })
   })
 
-  it(`should sum of events match`, (done) => {
-    let events_count = 0
-    supertest(`https://partners.betvictor.mobi/en-gb/in-play/1/events`)
-      .get('')
-      .end(function (_err, res) {
-        events_count += res.body.result.total_number_of_events
-        supertest(`https://partners.betvictor.mobi/de-de/in-play/1/events`)
-          .get('')
-          .end(function (_err, res) {
-            events_count += res.body.result.total_number_of_events
-            supertest(`https://partners.betvictor.mobi/cn-cn/in-play/1/events`)
-              .get('')
-              .end(function (_err, res) {
-                events_count += res.body.result.total_number_of_events
-                eventsBaseRoute
-                  .get('')
-                  .end(function (_err, res) {
-                    if (_err) throw _err
-                    expect(res.statusCode).to.equal(200)
-                    expect(res.body).to.be.an('array').that.is.not.empty
-                    expect(res.body.length, 'sum of total_number_of_events for all languages is not the same as all events').to.equal(events_count)
-                    done()
-                  })
-              })
-          })
-      })
-  })
 
   it(`should return all events`, (done) => {
     eventsBaseRoute
@@ -142,7 +120,7 @@ describe('Test events route', function () {
             expect(res.statusCode).to.equal(200)
             expect(res.body).to.not.be.empty
             // get last of found events
-            const response_item = res.body.pop()
+            const response_item = res.body.shift() // first results are EN
             // compare main fields with valid event, timestamps may vary
             expect(response_item.id).to.eql(validEvent.id)
             expect(response_item.event_type).to.eql(validEvent.event_type)
@@ -166,8 +144,8 @@ describe('Test events route', function () {
         if (_err) throw _err
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.be.an('array').that.is.not.empty
-        sports_EN = new Object(res.body)
-        const eventsOfSport = getEventsOfSport(validSportId, sports_EN)
+        sports_all = JSON.parse(JSON.stringify(res.body))
+        const eventsOfSport = getEventsOfSport(validSportId, sports_all)
         const sortedEvents = eventsOfSport.sort((a, b) => a.pos - b.pos)
 
         eventsBaseRoute
@@ -209,7 +187,7 @@ describe('Test events route', function () {
         if (_err) throw _err
         expect(res.statusCode).to.equal(200)
         expect(res.body).to.be.an('array').that.is.not.empty
-        const filtered_events = getEventsOfSport(validSportId, sports_EN)
+        const filtered_events = getEventsOfSport(validSportId, sports_all)
         const sorted = filtered_events.sort((a, b) => a.pos - b.pos)
         expect(res.body.length).to.equal(sorted.length)
         done()
